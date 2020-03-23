@@ -1,0 +1,15 @@
+﻿<Controls:MetroWindow
+    xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" x:Class="CheatPrintPDF.MyMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        ResizeMode="NoResize"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="Сообщение" Height="118" Width="474.4">
+    <Grid>
+        <Button Name="OkButton" Content="Ок" Style="{StaticResource AccentedSquareButtonStyle}" HorizontalAlignment="Left" Margin="196,57,0,0" VerticalAlignment="Top" Width="75" Click="OkButton_Click"/>
+        <TextBlock Name="MessageText" HorizontalAlignment="Left" TextAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Margin="10,10,0,0" Height="42" Width="448"/>
+    </Grid>
+</Controls:MetroWindow>
