@@ -64,14 +64,21 @@ namespace CheatPrintPDF
             StartButton.IsEnabled = false;
             OpenFileButton.IsEnabled = false;
 
-            //Класс для работы с пдф файлом
-            MyPDFFileWorker fileWorker = new MyPDFFileWorker();
+            try
+            {
+                //Класс для работы с пдф файлом
+                MyPDFFileWorker fileWorker = new MyPDFFileWorker();
 
-            //Результат обработки файла
-            result = fileWorker.GetPDFPagesTypes(await fileWorker.GetPdfPages(FilePath));
+                //Результат обработки файла
+                result = fileWorker.GetPDFPagesTypes(await fileWorker.GetPdfPages(FilePath));
 
-            //Обновляем датагрид
-            pdfDataGrid.ItemsSource = result;
+                //Обновляем датагрид
+                pdfDataGrid.ItemsSource = result;
+            }
+            catch (System.Exception ex)
+            {
+                MyMessageBox.Show(ex.ToString(), this);
+            }
 
             //Включаем кнопки
             StartButton.IsEnabled = true;
