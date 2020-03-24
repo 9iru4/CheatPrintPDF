@@ -7,13 +7,24 @@ using System.Threading.Tasks;
 
 namespace CheatPrintPDF
 {
+    /// <summary>
+    /// Класс описывающий фукционал для работы с пдф файлом
+    /// </summary>
     public class MyPDFFileWorker
     {
+        /// <summary>
+        /// Базовай конструктор
+        /// </summary>
         public MyPDFFileWorker()
         {
 
         }
 
+        /// <summary>
+        /// Преобразование страницы в изображение
+        /// </summary>
+        /// <param name="page">Страница</param>
+        /// <returns>Изображение</returns>
         public Bitmap PdfToBitmap(PdfPage page)
         {
             using (var bmp = new PdfBitmap((int)page.Width, (int)page.Height, true))
@@ -26,7 +37,12 @@ namespace CheatPrintPDF
             }
         }
 
-        public List<PagesResult> GetPDFPagesTypes(List<MyPDFFile> myPDFFiles)
+        /// <summary>
+        /// Метод получающий сгруппированные страницы по типу
+        /// </summary>
+        /// <param name="myPDFPages">Страницы</param>
+        /// <returns>Сгруппированные страницы</returns>
+        public List<PagesResult> GetPDFPagesTypes(List<MyPDFPage> myPDFPages)
         {
             List<PagesResult> Pages = new List<PagesResult>();
 
@@ -36,9 +52,9 @@ namespace CheatPrintPDF
             {
                 buffer = new PagesResult((PageSizeTypes)i);
 
-                foreach (var pdfpage in myPDFFiles.ToList())
+                foreach (var pdfpage in myPDFPages.ToList())
                 {
-                    if (myPDFFiles.Contains(pdfpage) && (int)pdfpage.SizeType == i)
+                    if (myPDFPages.Contains(pdfpage) && (int)pdfpage.SizeType == i)
                     {
                         buffer.Pages.Add(pdfpage.PageNumber);
                     }
@@ -46,13 +62,18 @@ namespace CheatPrintPDF
                 }
                 if (buffer.Pages.Count != 0)
                 {
-                    buffer.SetCopyPages();
+                    buffer.SetCopyPagesAndText();
                     Pages.Add(buffer);
                 }
             }
             return Pages;
         }
 
+        /// <summary>
+        /// Проверка страницы на цветность
+        /// </summary>
+        /// <param name="myBitmap">Изображене</param>
+        /// <returns>Цветная ли страница</returns>
         public async Task<bool> CheckIsColored(Bitmap myBitmap)
         {
             return await Task.Run(() =>
@@ -66,41 +87,51 @@ namespace CheatPrintPDF
                         {
                             continue;
                         }
-                        else return true;
+                        else
+                        {
+                            myBitmap.Dispose();
+                            return true;
+                        }
                     }
                 }
+                myBitmap.Dispose();
                 return false;
             });
         }
 
-        public async Task<List<MyPDFFile>> GetPdfPages(string pathToFile)
+        /// <summary>
+        /// Метод получения страниц из пдф файла
+        /// </summary>
+        /// <param name="pathToFile">Путь к файлу пдф</param>
+        /// <returns>Страницы</returns>
+        public async Task<List<MyPDFPage>> GetPdfPages(string pathToFile)
         {
-            List<MyPDFFile> pdfPages = new List<MyPDFFile>();
+            List<MyPDFPage> pdfPages = new List<MyPDFPage>();
             using (var doc = PdfDocument.Load(pathToFile))
             {
                 for (int i = 0; i < doc.Pages.Count; i++)
                 {
-                    MyPDFFile myPDFFile = new MyPDFFile(i + 1, doc.Pages[i].Width * 0.3528f, doc.Pages[i].Height * 0.3528f);
+                    MyPDFPage myPDFFile = new MyPDFPage(i + 1, doc.Pages[i].Width * 0.3528f, doc.Pages[i].Height * 0.3528f);
+                    if (myPDFFile.SizeType == PageSizeTypes.A3)
+                    {
+                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
+                        if (!myPDFFile.isColored)
+                        {
+                            myPDFFile.SizeType = PageSizeTypes.A3_BW;
+                        }
+                    }
                     if (myPDFFile.SizeType == PageSizeTypes.A4)
                     {
                         myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
-                        if (!myPDFFile.isColored) myPDFFile.SizeType = PageSizeTypes.A4xUncolored;
-
-                    }
-                    if (myPDFFile.SizeType == PageSizeTypes.A3)
-                    {
-                        if (i == 9)
+                        if (!myPDFFile.isColored)
                         {
+                            myPDFFile.SizeType = PageSizeTypes.A4_BW;
                         }
-                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
-                        if (!myPDFFile.isColored) myPDFFile.SizeType = PageSizeTypes.A3xUncolored;
                     }
                     pdfPages.Add(myPDFFile);
                 }
             }
             return pdfPages;
         }
-
-
     }
 }

@@ -15,7 +15,7 @@
         <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="2" HorizontalAlignment="Left" Height="215" Margin="10,106,0,0" VerticalAlignment="Top" Width="774" >
             <DataGrid x:Name="pdfDataGrid" HorizontalAlignment="Left" IsReadOnly="True" CanUserAddRows="False" Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top" Height="215" Width="774" AutoGenerateColumns="False" Margin="-0.8,-0.8,-0.4,-0.6" MouseDoubleClick="pdfDataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Формат страниц" FontWeight="Bold" Binding="{Binding PagesType}" Width="140"/>
+                    <DataGridTextColumn Header="Формат страниц" FontWeight="Bold" Binding="{Binding PagesTypeText}" Width="140"/>
                     <DataGridTextColumn Header="Номера страниц" Binding="{Binding CopyPages}" Width="650"/>
                 </DataGrid.Columns>
             </DataGrid>

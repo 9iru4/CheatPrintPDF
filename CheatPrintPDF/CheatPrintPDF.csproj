@@ -118,7 +118,7 @@
     <Compile Include="MyMessageBox.xaml.cs">
       <DependentUpon>MyMessageBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MyPDFFile.cs" />
+    <Compile Include="MyPDFPage.cs" />
     <Compile Include="MyPDFFileWorker.cs" />
     <Compile Include="PagesResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

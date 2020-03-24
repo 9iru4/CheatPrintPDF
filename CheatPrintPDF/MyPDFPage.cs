@@ -2,26 +2,53 @@
 
 namespace CheatPrintPDF
 {
-    public class MyPDFFile : EqualityComparer<MyPDFFile>
+    /// <summary>
+    /// Класс описывающий пдф страницу
+    /// </summary>
+    public class MyPDFPage : EqualityComparer<MyPDFPage>
     {
+        /// <summary>
+        /// Номер страницы
+        /// </summary>
         public int PageNumber { get; set; }
+        /// <summary>
+        /// Ширина
+        /// </summary>
         public double Width { get; set; }
+        /// <summary>
+        /// Длина
+        /// </summary>
         public double Height { get; set; }
+        /// <summary>
+        /// Цветная ли страница
+        /// </summary>
         public bool isColored { get; set; }
+        /// <summary>
+        /// Формат страницы
+        /// </summary>
         public PageSizeTypes SizeType { get; set; }
 
-        public MyPDFFile(int pageNumber, double width, double height)
+        /// <summary>
+        /// Конструктор страницы
+        /// </summary>
+        /// <param name="pageNumber">Номер страницы</param>
+        /// <param name="width">Ширина</param>
+        /// <param name="height">Длина</param>
+        public MyPDFPage(int pageNumber, double width, double height)
         {
             PageNumber = pageNumber;
             Width = width;
             Height = height;
-            SetPageSizeType();
+            SetPageSizeType();//Установить тип страницы
             isColored = false;
         }
 
-        public void SetPageSizeType()
+        /// <summary>
+        /// Устанавливает тип страницы
+        /// </summary>
+        void SetPageSizeType()
         {
-            var side = Width > Height ? Width : Height;
+            var side = Width > Height ? Width : Height;//определяем большую сторону
 
             if ((250 < Width && Width < 330 || 250 < Height && Height < 330) && (170 < Width && Width < 240 || 170 < Height && Height < 240))
             {
@@ -282,13 +309,24 @@ namespace CheatPrintPDF
             return;
         }
 
-        public override bool Equals(MyPDFFile x, MyPDFFile y)
+        /// <summary>
+        /// Сравнивает страницы по номеру
+        /// </summary>
+        /// <param name="x">Страница 1</param>
+        /// <param name="y">Страница 2</param>
+        /// <returns>Результат проверки на равенство</returns>
+        public override bool Equals(MyPDFPage x, MyPDFPage y)
         {
             if (x.PageNumber == y.PageNumber) return true;
             else return false;
         }
 
-        public override int GetHashCode(MyPDFFile obj)
+        /// <summary>
+        /// Получение хешкода
+        /// </summary>
+        /// <param name="obj">Страница</param>
+        /// <returns>Хешкод</returns>
+        public override int GetHashCode(MyPDFPage obj)
         {
             return (int)(obj.Width * obj.Height);
         }
