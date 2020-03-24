@@ -67,6 +67,10 @@ namespace CheatPrintPDF
             {
                 PagesTypeText = "A3(ц)";
             }
+            else if (PageSizeTypes.None == PagesType)
+            {
+                PagesTypeText = "не определено";
+            }
             else
             {
                 PagesTypeText = PagesType.ToString();
