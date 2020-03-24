@@ -62,10 +62,11 @@ namespace CheatPrintPDF
                     for (int n = 0; n < myBitmap.Width; n++)
                     {
                         var pcolor = myBitmap.GetPixel(n, k);
-                        if ((pcolor.R != pcolor.B && pcolor.R != pcolor.G && pcolor.G != pcolor.B))
+                        if ((pcolor.R == pcolor.B && pcolor.R == pcolor.G && pcolor.G == pcolor.B))
                         {
-                            return true;
+                            continue;
                         }
+                        else return true;
                     }
                 }
                 return false;
@@ -80,10 +81,19 @@ namespace CheatPrintPDF
                 for (int i = 0; i < doc.Pages.Count; i++)
                 {
                     MyPDFFile myPDFFile = new MyPDFFile(i + 1, doc.Pages[i].Width * 0.3528f, doc.Pages[i].Height * 0.3528f);
-                    if (myPDFFile.SizeType == PageSizeTypes.A4 || myPDFFile.SizeType == PageSizeTypes.A3)
+                    if (myPDFFile.SizeType == PageSizeTypes.A4)
                     {
                         myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
                         if (!myPDFFile.isColored) myPDFFile.SizeType = PageSizeTypes.A4xUncolored;
+
+                    }
+                    if (myPDFFile.SizeType == PageSizeTypes.A3)
+                    {
+                        if (i == 9)
+                        {
+                        }
+                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
+                        if (!myPDFFile.isColored) myPDFFile.SizeType = PageSizeTypes.A3xUncolored;
                     }
                     pdfPages.Add(myPDFFile);
                 }
