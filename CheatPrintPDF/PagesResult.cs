@@ -69,7 +69,7 @@ namespace CheatPrintPDF
             }
             else if (PageSizeTypes.None == PagesType)
             {
-                PagesTypeText = "не определено";
+                PagesTypeText = "Не определено";
             }
             else
             {

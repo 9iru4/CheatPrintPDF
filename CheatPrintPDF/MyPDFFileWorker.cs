@@ -1,9 +1,10 @@
-﻿using Patagames.Pdf;
-using Patagames.Pdf.Net;
+﻿using PdfSharp.Pdf.IO;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TallComponents.PDF.Rasterizer;
 
 namespace CheatPrintPDF
 {
@@ -25,15 +26,17 @@ namespace CheatPrintPDF
         /// </summary>
         /// <param name="page">Страница</param>
         /// <returns>Изображение</returns>
-        public Bitmap PdfToBitmap(PdfPage page)
+        public Image PdfToBitmap(string pathToFile, int pageNumber)
         {
-            using (var bmp = new PdfBitmap((int)page.Width, (int)page.Height, true))
+            Document pdfDocument = new Document(new FileStream(pathToFile, FileMode.Open, FileAccess.Read));
+            Page pdfPage = pdfDocument.Pages[pageNumber];
+            // create a bitmap to draw to and a graphics object
+            Bitmap bitmap = new Bitmap((int)pdfPage.Width, (int)pdfPage.Height);
+            using (Graphics graphics = Graphics.FromImage(bitmap))
             {
-                bmp.FillRect(0, 0, (int)page.Width, (int)page.Height, FS_COLOR.White);
-                page.Render(bmp, 0, 0, (int)page.Width, (int)page.Height,
-                    Patagames.Pdf.Enums.PageRotate.Normal,
-                    Patagames.Pdf.Enums.RenderFlags.FPDF_ANNOT);
-                return new Bitmap(bmp.Image);
+                //draw the image from the first page to the graphics object, which is connected to the bitmap object
+                pdfPage.Draw(graphics);
+                return bitmap;
             }
         }
 
@@ -48,7 +51,7 @@ namespace CheatPrintPDF
 
             PagesResult buffer;
 
-            for (int i = 0; i < (int)PageSizeTypes.None; i++)
+            for (int i = 0; i < (int)PageSizeTypes.None + 1; i++)
             {
                 buffer = new PagesResult((PageSizeTypes)i);
 
@@ -74,28 +77,31 @@ namespace CheatPrintPDF
         /// </summary>
         /// <param name="myBitmap">Изображене</param>
         /// <returns>Цветная ли страница</returns>
-        public async Task<bool> CheckIsColored(Bitmap myBitmap)
+        public async Task<bool> CheckIsColored(Image image)
         {
             return await Task.Run(() =>
             {
-                for (int k = 0; k < myBitmap.Height; k++)
+                using (Bitmap myBitmap = new Bitmap(image))
                 {
-                    for (int n = 0; n < myBitmap.Width; n++)
+                    for (int k = 0; k < myBitmap.Height; k++)
                     {
-                        var pcolor = myBitmap.GetPixel(n, k);
-                        if ((pcolor.R == pcolor.B && pcolor.R == pcolor.G && pcolor.G == pcolor.B))
+                        for (int n = 0; n < myBitmap.Width; n++)
                         {
-                            continue;
-                        }
-                        else
-                        {
-                            myBitmap.Dispose();
-                            return true;
+                            var pcolor = myBitmap.GetPixel(n, k);
+                            if ((pcolor.R == pcolor.B && pcolor.R == pcolor.G && pcolor.G == pcolor.B))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                myBitmap.Dispose();
+                                return true;
+                            }
                         }
                     }
+                    myBitmap.Dispose();
+                    return false;
                 }
-                myBitmap.Dispose();
-                return false;
             });
         }
 
@@ -107,14 +113,14 @@ namespace CheatPrintPDF
         public async Task<List<MyPDFPage>> GetPdfPages(string pathToFile)
         {
             List<MyPDFPage> pdfPages = new List<MyPDFPage>();
-            using (var doc = PdfDocument.Load(pathToFile))
+            using (var doc = PdfReader.Open(pathToFile))
             {
                 for (int i = 0; i < doc.Pages.Count; i++)
                 {
                     MyPDFPage myPDFFile = new MyPDFPage(i + 1, doc.Pages[i].Width * 0.3528f, doc.Pages[i].Height * 0.3528f);
                     if (myPDFFile.SizeType == PageSizeTypes.A3)
                     {
-                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
+                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(pathToFile, i));
                         if (!myPDFFile.isColored)
                         {
                             myPDFFile.SizeType = PageSizeTypes.A3_BW;
@@ -122,7 +128,7 @@ namespace CheatPrintPDF
                     }
                     if (myPDFFile.SizeType == PageSizeTypes.A4)
                     {
-                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(doc.Pages[i]));
+                        myPDFFile.isColored = await CheckIsColored(PdfToBitmap(pathToFile, i));
                         if (!myPDFFile.isColored)
                         {
                             myPDFFile.SizeType = PageSizeTypes.A4_BW;

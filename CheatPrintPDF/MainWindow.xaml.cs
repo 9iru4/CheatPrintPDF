@@ -1,6 +1,5 @@
 ﻿using MahApps.Metro.Controls;
 using Microsoft.Win32;
-using Patagames.Pdf.Net;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
@@ -27,7 +26,6 @@ namespace CheatPrintPDF
         public MainWindow()
         {
             InitializeComponent();
-            PdfCommon.Initialize();
         }
 
         /// <summary>
